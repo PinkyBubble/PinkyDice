@@ -1,9 +1,14 @@
-# Dice roll sound
+# Dice sounds
 
-Place your dice roll sound effect here:
+The app plays a short **tap** then a **roll/tumble** when you roll (if sound is on in Settings).
 
-**`dice-roll.mp3`**
+| File | Role |
+|------|------|
+| `dice-roll.mp3` | Main dice rolling / tumbling on a surface |
+| `dice-tap.mp3` | Short initial hit (optional; roll still works if only `dice-roll.mp3` loads) |
 
-The app loads this file via `expo-av` when rolling starts (if sound is enabled in Settings). If the file is missing or fails to load, rolling still works without audio.
+Replace these with your own **realistic dice** recordings (MP3, ~0.2–1.5s). Keep filenames the same, or update `src/hooks/useDiceSound.ts`.
 
-Recommended: short clip (~0.3–1s), MP3 format.
+**Tips for realistic SFX:** several dice on felt or wood, one clean recording; avoid music or voice.
+
+Current bundled clips are from [Mixkit](https://mixkit.co/) (free license).
