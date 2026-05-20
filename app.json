@@ -2,7 +2,7 @@
   "expo": {
     "name": "PinkyDice",
     "slug": "PinkyDice",
-    "version": "1.1.0",
+    "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -12,18 +12,30 @@
       "backgroundColor": "#FFE8F4"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.pinkybubble.pinkydice",
+      "buildNumber": "1"
     },
     "android": {
+      "package": "com.pinkybubble.pinkydice",
+      "versionCode": 1,
       "adaptiveIcon": {
-        "backgroundColor": "#FFC4E0",
-        "foregroundImage": "./assets/android-icon-foreground.png",
-        "backgroundImage": "./assets/android-icon-background.png",
-        "monochromeImage": "./assets/android-icon-monochrome.png"
-      }
+        "foregroundImage": "./assets/icon.png",
+        "backgroundColor": "#FFC4E0"
+      },
+      "edgeToEdgeEnabled": true,
+      "permissions": [
+        "android.permission.WRITE_SETTINGS"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "21dc80e3-ceda-4763-b8d4-4fca1bf957d3"
+      }
+    },
+    "owner": "pinkybubble"
   }
 }
