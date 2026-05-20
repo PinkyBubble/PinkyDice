@@ -1,15 +1,26 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+import type { DieValue } from '../types/dice';
 import {
   INITIAL_DICE_COUNT,
   RESULT_REVEAL_MS,
-  type DieValue,
   clampDiceCount,
   rollDice,
 } from '../utils/dice';
 import { hapticRollEnd, hapticRollStart } from '../utils/haptics';
 
-export function useDiceRoll() {
+type UseDiceRollOptions = {
+  onRollStart?: () => void;
+  onRollComplete?: (values: DieValue[], diceCount: number) => void;
+};
+
+export function useDiceRoll(options: UseDiceRollOptions = {}) {
+  const { onRollStart, onRollComplete } = options;
+  const onRollStartRef = useRef(onRollStart);
+  const onRollCompleteRef = useRef(onRollComplete);
+  onRollStartRef.current = onRollStart;
+  onRollCompleteRef.current = onRollComplete;
+
   const [diceCount, setDiceCountState] = useState(INITIAL_DICE_COUNT);
   const [values, setValues] = useState<DieValue[]>(() =>
     rollDice(INITIAL_DICE_COUNT),
@@ -31,6 +42,20 @@ export function useDiceRoll() {
   }, []);
 
   useEffect(() => () => clearRevealTimeout(), [clearRevealTimeout]);
+
+  const applyDiceCount = useCallback((next: number) => {
+    const clamped = clampDiceCount(next);
+    setDiceCountState(clamped);
+    setValues((prev) => {
+      if (prev.length === clamped) {
+        return prev;
+      }
+      if (prev.length < clamped) {
+        return [...prev, ...rollDice(clamped - prev.length)];
+      }
+      return prev.slice(0, clamped);
+    });
+  }, []);
 
   const incrementDice = useCallback(() => {
     setDiceCountState((current) => {
@@ -66,8 +91,10 @@ export function useDiceRoll() {
     setRollGeneration((g) => g + 1);
 
     void hapticRollStart();
+    onRollStartRef.current?.();
 
-    const nextValues = rollDice(valuesRef.current.length);
+    const count = valuesRef.current.length;
+    const nextValues = rollDice(count);
     clearRevealTimeout();
 
     revealTimeoutRef.current = setTimeout(() => {
@@ -76,6 +103,7 @@ export function useDiceRoll() {
       rollingRef.current = false;
       revealTimeoutRef.current = null;
       void hapticRollEnd();
+      onRollCompleteRef.current?.(nextValues, count);
     }, RESULT_REVEAL_MS);
   }, [clearRevealTimeout]);
 
@@ -86,6 +114,7 @@ export function useDiceRoll() {
     rollGeneration,
     incrementDice,
     decrementDice,
+    setDiceCount: applyDiceCount,
     roll,
   };
 }

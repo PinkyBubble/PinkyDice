@@ -1,31 +1,30 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import { Pressable, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
 import { DiceArea } from './src/components/DiceArea';
-import { DiceSelector } from './src/components/DiceSelector';
-import { ResultSummary } from './src/components/ResultSummary';
 import { RollButton } from './src/components/RollButton';
+import { SettingsModal } from './src/components/SettingsModal';
+import { ShakeIndicator } from './src/components/ShakeIndicator';
 import { colors } from './src/constants/colors';
-import { useDiceRoll } from './src/hooks/useDiceRoll';
+import { PinkyDiceProvider, usePinkyDice } from './src/context/PinkyDiceContext';
 
-export default function App() {
+function MainScreen() {
   const { height } = useWindowDimensions();
   const compact = height < 700;
 
   const {
-    diceCount,
     values,
     isRolling,
     rollGeneration,
-    incrementDice,
-    decrementDice,
     roll,
-  } = useDiceRoll();
+    shakeEnabled,
+    openSettings,
+  } = usePinkyDice();
 
   return (
-    <SafeAreaProvider>
+    <>
       <LinearGradient
         colors={[colors.backgroundStart, colors.backgroundEnd]}
         style={styles.gradient}
@@ -34,8 +33,22 @@ export default function App() {
         <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
           <View style={styles.screen}>
             <View style={[styles.header, compact && styles.headerCompact]}>
-              <Text style={styles.title}>PinkyDice</Text>
-              <Text style={styles.subtitle}>Cute 3D Dice Roller</Text>
+              <View style={styles.headerSpacer} />
+              <View style={styles.headerCenter}>
+                <Text style={styles.title}>PinkyDice</Text>
+                <Text style={styles.subtitle}>Cute 3D Dice Roller</Text>
+              </View>
+              <Pressable
+                onPress={openSettings}
+                style={({ pressed }) => [
+                  styles.settingsBtn,
+                  pressed && styles.settingsBtnPressed,
+                ]}
+                accessibilityLabel="Open settings"
+                hitSlop={8}
+              >
+                <Text style={styles.settingsIcon}>⚙</Text>
+              </Pressable>
             </View>
 
             <View style={styles.main}>
@@ -45,24 +58,10 @@ export default function App() {
                 isRolling={isRolling}
                 compact={compact}
               />
-
-              <View style={[styles.section, compact && styles.sectionCompact]}>
-                <DiceSelector
-                  count={diceCount}
-                  onIncrement={incrementDice}
-                  onDecrement={decrementDice}
-                  disabled={isRolling}
-                />
-              </View>
-
-              <ResultSummary
-                values={values}
-                isRolling={isRolling}
-                compact={compact}
-              />
             </View>
 
             <View style={styles.footer}>
+              <ShakeIndicator enabled={shakeEnabled} compact={compact} />
               <RollButton
                 onPress={roll}
                 disabled={isRolling}
@@ -72,6 +71,17 @@ export default function App() {
           </View>
         </SafeAreaView>
       </LinearGradient>
+      <SettingsModal />
+    </>
+  );
+}
+
+export default function App() {
+  return (
+    <SafeAreaProvider>
+      <PinkyDiceProvider>
+        <MainScreen />
+      </PinkyDiceProvider>
     </SafeAreaProvider>
   );
 }
@@ -88,6 +98,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   header: {
+    flexDirection: 'row',
     alignItems: 'center',
     paddingTop: 8,
     paddingBottom: 12,
@@ -96,20 +107,38 @@ const styles = StyleSheet.create({
     paddingTop: 4,
     paddingBottom: 8,
   },
+  headerSpacer: {
+    width: 44,
+  },
+  headerCenter: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  settingsBtn: {
+    width: 44,
+    height: 44,
+    borderRadius: 14,
+    backgroundColor: colors.selectorBg,
+    borderWidth: 1,
+    borderColor: colors.selectorBorder,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  settingsBtnPressed: {
+    opacity: 0.88,
+    transform: [{ scale: 0.96 }],
+  },
+  settingsIcon: {
+    fontSize: 22,
+    color: colors.primary,
+  },
   main: {
     flex: 1,
     justifyContent: 'center',
     minHeight: 0,
   },
-  section: {
-    marginTop: 16,
-    marginBottom: 4,
-  },
-  sectionCompact: {
-    marginTop: 10,
-  },
   footer: {
-    paddingTop: 12,
+    paddingTop: 8,
     paddingBottom: 4,
   },
   title: {
