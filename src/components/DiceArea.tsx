@@ -11,26 +11,34 @@ type DiceAreaProps = {
   compact?: boolean;
 };
 
-function getDieSize(count: number, areaWidth: number, compact?: boolean): number {
-  const padding = 24;
-  const available = areaWidth - padding * 2;
-  const cap = (n: number) => (compact ? n * 0.88 : n);
+/** Dice per row for layout width math (not always === count). */
+function colsForCount(count: number): number {
+  if (count <= 1) return 1;
+  if (count === 2) return 2;
+  if (count === 3) return 3;
+  if (count === 4) return 2;
+  return 3;
+}
 
-  switch (count) {
-    case 1:
-      return cap(Math.min(available * 0.55, 140));
-    case 2:
-      return cap(Math.min((available - 16) / 2, 100));
-    case 3:
-      return cap(Math.min((available - 32) / 3, 88));
-    case 4:
-      return cap(Math.min((available - 16) / 2, 86));
-    case 5:
-      return cap(Math.min((available - 32) / 3, 78));
-    case 6:
-    default:
-      return cap(Math.min((available - 32) / 3, 72));
-  }
+function getDieSize(count: number, areaWidth: number, compact?: boolean): number {
+  const padding = 12;
+  const available = areaWidth - padding * 2;
+  const cols = colsForCount(count);
+  const gap = (cols - 1) * 6;
+  const fromWidth = (available - gap) / cols;
+  const cap = (n: number) => Math.round(compact ? n * 0.94 : n);
+
+  const maxByCount: Record<number, number> = {
+    1: 220,
+    2: 172,
+    3: 138,
+    4: 132,
+    5: 118,
+    6: 112,
+  };
+
+  const maxCap = maxByCount[count] ?? 112;
+  return cap(Math.min(fromWidth, maxCap));
 }
 
 function DiceSlot({
@@ -66,7 +74,7 @@ export function DiceArea({
   compact,
 }: DiceAreaProps) {
   const { width } = useWindowDimensions();
-  const areaWidth = Math.min(width - 48, 400);
+  const areaWidth = Math.min(width - 40, 520);
   const count = values.length;
   const dieSize = getDieSize(count, areaWidth, compact);
   const cardBase = [styles.card, compact && styles.cardCompact];
@@ -143,11 +151,11 @@ const styles = StyleSheet.create({
     borderRadius: 28,
     borderWidth: 1,
     borderColor: colors.cardBorder,
-    paddingVertical: 20,
-    paddingHorizontal: 16,
-    minHeight: 160,
+    paddingVertical: 14,
+    paddingHorizontal: 12,
+    minHeight: 140,
     width: '100%',
-    maxWidth: 400,
+    maxWidth: 520,
     alignSelf: 'center',
     shadowColor: colors.shadow,
     shadowOffset: { width: 0, height: 4 },
@@ -169,7 +177,7 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     justifyContent: 'center',
     alignItems: 'center',
-    gap: 4,
+    gap: 6,
   },
   rowCentered: {
     justifyContent: 'center',
@@ -183,8 +191,9 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     justifyContent: 'center',
     alignItems: 'center',
-    gap: 4,
-    maxWidth: 220,
+    gap: 6,
+    width: '100%',
+    maxWidth: 520,
     alignSelf: 'center',
   },
   grid3x2: {
@@ -192,8 +201,9 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     justifyContent: 'center',
     alignItems: 'center',
-    gap: 4,
-    maxWidth: 280,
+    gap: 6,
+    width: '100%',
+    maxWidth: 520,
     alignSelf: 'center',
   },
   slot: {
