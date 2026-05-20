@@ -7,13 +7,18 @@ import { sumDice } from '../utils/dice';
 type ResultSummaryProps = {
   values: DieValue[];
   isRolling: boolean;
+  compact?: boolean;
 };
 
-export function ResultSummary({ values, isRolling }: ResultSummaryProps) {
+export function ResultSummary({
+  values,
+  isRolling,
+  compact,
+}: ResultSummaryProps) {
   const total = sumDice(values);
   return (
-    <View style={styles.wrap}>
-      <Text style={styles.caption}>Sonuç</Text>
+    <View style={[styles.wrap, compact && styles.wrapCompact]}>
+      <Text style={styles.caption}>Result</Text>
       <Text style={styles.total}>
         {isRolling ? '…' : total}
       </Text>
@@ -23,13 +28,16 @@ export function ResultSummary({ values, isRolling }: ResultSummaryProps) {
         </Text>
       )}
       {isRolling && (
-        <Text style={styles.detail}>Zarlar dönüyor</Text>
+        <Text style={styles.detail}>Rolling dice…</Text>
       )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  wrapCompact: {
+    minHeight: 56,
+  },
   wrap: {
     alignItems: 'center',
     minHeight: 72,

@@ -15,7 +15,7 @@ export function RollButton({ onPress, disabled, loading }: RollButtonProps) {
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel="Zar at"
+      accessibilityLabel="Roll dice"
       onPress={onPress}
       disabled={isDisabled}
       hitSlop={4}
@@ -39,10 +39,10 @@ export function RollButton({ onPress, disabled, loading }: RollButtonProps) {
         {loading ? (
           <>
             <ActivityIndicator color={colors.primaryText} size="small" />
-            <Text style={[styles.label, styles.loadingLabel]}>Atılıyor…</Text>
+            <Text style={[styles.label, styles.loadingLabel]}>Rolling…</Text>
           </>
         ) : (
-          <Text style={styles.label}>Zar at</Text>
+          <Text style={styles.label}>Roll dice</Text>
         )}
       </LinearGradient>
     </Pressable>

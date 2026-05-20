@@ -21,10 +21,10 @@ export function DiceSelector({
 
   return (
     <View style={styles.wrap}>
-      <Text style={styles.label}>Zar sayısı</Text>
+      <Text style={styles.label}>Number of dice</Text>
       <View style={styles.row}>
         <Pressable
-          accessibilityLabel="Zar sayısını azalt"
+          accessibilityLabel="Decrease dice count"
           onPress={onDecrement}
           disabled={disabled || atMin}
           hitSlop={8}
@@ -40,7 +40,7 @@ export function DiceSelector({
           <Text style={styles.count}>{count}</Text>
         </View>
         <Pressable
-          accessibilityLabel="Zar sayısını artır"
+          accessibilityLabel="Increase dice count"
           onPress={onIncrement}
           disabled={disabled || atMax}
           hitSlop={8}

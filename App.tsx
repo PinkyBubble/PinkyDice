@@ -1,12 +1,6 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { StatusBar } from 'expo-status-bar';
-import {
-  ScrollView,
-  StyleSheet,
-  Text,
-  useWindowDimensions,
-  View,
-} from 'react-native';
+import { StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
 import { DiceArea } from './src/components/DiceArea';
@@ -38,35 +32,35 @@ export default function App() {
       >
         <StatusBar style="dark" />
         <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
-          <ScrollView
-            contentContainerStyle={[
-              styles.scroll,
-              compact && styles.scrollCompact,
-            ]}
-            keyboardShouldPersistTaps="handled"
-            showsVerticalScrollIndicator={false}
-          >
-            <View style={styles.header}>
+          <View style={styles.screen}>
+            <View style={[styles.header, compact && styles.headerCompact]}>
               <Text style={styles.title}>PinkyDice</Text>
               <Text style={styles.subtitle}>Cute 3D Dice Roller</Text>
             </View>
 
-            <DiceArea
-              values={values}
-              rollGeneration={rollGeneration}
-              isRolling={isRolling}
-            />
+            <View style={styles.main}>
+              <DiceArea
+                values={values}
+                rollGeneration={rollGeneration}
+                isRolling={isRolling}
+                compact={compact}
+              />
 
-            <View style={styles.section}>
-              <DiceSelector
-                count={diceCount}
-                onIncrement={incrementDice}
-                onDecrement={decrementDice}
-                disabled={isRolling}
+              <View style={[styles.section, compact && styles.sectionCompact]}>
+                <DiceSelector
+                  count={diceCount}
+                  onIncrement={incrementDice}
+                  onDecrement={decrementDice}
+                  disabled={isRolling}
+                />
+              </View>
+
+              <ResultSummary
+                values={values}
+                isRolling={isRolling}
+                compact={compact}
               />
             </View>
-
-            <ResultSummary values={values} isRolling={isRolling} />
 
             <View style={styles.footer}>
               <RollButton
@@ -75,7 +69,7 @@ export default function App() {
                 loading={isRolling}
               />
             </View>
-          </ScrollView>
+          </View>
         </SafeAreaView>
       </LinearGradient>
     </SafeAreaProvider>
@@ -89,20 +83,34 @@ const styles = StyleSheet.create({
   safe: {
     flex: 1,
   },
-  scroll: {
-    flexGrow: 1,
+  screen: {
+    flex: 1,
     paddingHorizontal: 20,
-    paddingBottom: 16,
-    justifyContent: 'space-between',
-    minHeight: '100%',
-  },
-  scrollCompact: {
-    paddingBottom: 8,
   },
   header: {
     alignItems: 'center',
     paddingTop: 8,
-    paddingBottom: 20,
+    paddingBottom: 12,
+  },
+  headerCompact: {
+    paddingTop: 4,
+    paddingBottom: 8,
+  },
+  main: {
+    flex: 1,
+    justifyContent: 'center',
+    minHeight: 0,
+  },
+  section: {
+    marginTop: 16,
+    marginBottom: 4,
+  },
+  sectionCompact: {
+    marginTop: 10,
+  },
+  footer: {
+    paddingTop: 12,
+    paddingBottom: 4,
   },
   title: {
     fontSize: 36,
@@ -115,14 +123,5 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '500',
     color: colors.subtitle,
-  },
-  section: {
-    marginTop: 24,
-    marginBottom: 8,
-  },
-  footer: {
-    marginTop: 'auto',
-    paddingTop: 16,
-    paddingBottom: 8,
   },
 });

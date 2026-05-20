@@ -8,26 +8,28 @@ type DiceAreaProps = {
   values: DieValue[];
   rollGeneration: number;
   isRolling: boolean;
+  compact?: boolean;
 };
 
-function getDieSize(count: number, areaWidth: number): number {
+function getDieSize(count: number, areaWidth: number, compact?: boolean): number {
   const padding = 24;
   const available = areaWidth - padding * 2;
+  const cap = (n: number) => (compact ? n * 0.88 : n);
 
   switch (count) {
     case 1:
-      return Math.min(available * 0.55, 140);
+      return cap(Math.min(available * 0.55, 140));
     case 2:
-      return Math.min((available - 16) / 2, 100);
+      return cap(Math.min((available - 16) / 2, 100));
     case 3:
-      return Math.min((available - 32) / 3, 88);
+      return cap(Math.min((available - 32) / 3, 88));
     case 4:
-      return Math.min((available - 16) / 2, 86);
+      return cap(Math.min((available - 16) / 2, 86));
     case 5:
-      return Math.min((available - 32) / 3, 78);
+      return cap(Math.min((available - 32) / 3, 78));
     case 6:
     default:
-      return Math.min((available - 32) / 3, 72);
+      return cap(Math.min((available - 32) / 3, 72));
   }
 }
 
@@ -57,17 +59,23 @@ function DiceSlot({
   );
 }
 
-export function DiceArea({ values, rollGeneration, isRolling }: DiceAreaProps) {
+export function DiceArea({
+  values,
+  rollGeneration,
+  isRolling,
+  compact,
+}: DiceAreaProps) {
   const { width } = useWindowDimensions();
   const areaWidth = Math.min(width - 48, 400);
   const count = values.length;
-  const dieSize = getDieSize(count, areaWidth);
+  const dieSize = getDieSize(count, areaWidth, compact);
+  const cardBase = [styles.card, compact && styles.cardCompact];
 
   const common = { size: dieSize, rollGeneration, isRolling };
 
   if (count === 1) {
     return (
-      <View style={[styles.card, styles.center]}>
+      <View style={[...cardBase, styles.center]}>
         <DiceSlot value={values[0]} index={0} {...common} />
       </View>
     );
@@ -75,7 +83,7 @@ export function DiceArea({ values, rollGeneration, isRolling }: DiceAreaProps) {
 
   if (count === 2) {
     return (
-      <View style={[styles.card, styles.row, styles.center]}>
+      <View style={[...cardBase, styles.row, styles.center]}>
         {values.map((v, i) => (
           <DiceSlot key={i} value={v} index={i} {...common} />
         ))}
@@ -85,7 +93,7 @@ export function DiceArea({ values, rollGeneration, isRolling }: DiceAreaProps) {
 
   if (count === 3) {
     return (
-      <View style={[styles.card, styles.row, styles.center]}>
+      <View style={[...cardBase, styles.row, styles.center]}>
         {values.map((v, i) => (
           <DiceSlot key={i} value={v} index={i} {...common} />
         ))}
@@ -95,7 +103,7 @@ export function DiceArea({ values, rollGeneration, isRolling }: DiceAreaProps) {
 
   if (count === 4) {
     return (
-      <View style={[styles.card, styles.grid2]}>
+      <View style={[...cardBase, styles.grid2]}>
         {values.map((v, i) => (
           <DiceSlot key={i} value={v} index={i} {...common} />
         ))}
@@ -105,7 +113,7 @@ export function DiceArea({ values, rollGeneration, isRolling }: DiceAreaProps) {
 
   if (count === 5) {
     return (
-      <View style={[styles.card, styles.stack]}>
+      <View style={[...cardBase, styles.stack]}>
         <View style={styles.row}>
           {values.slice(0, 3).map((v, i) => (
             <DiceSlot key={i} value={v} index={i} {...common} />
@@ -121,7 +129,7 @@ export function DiceArea({ values, rollGeneration, isRolling }: DiceAreaProps) {
   }
 
   return (
-    <View style={[styles.card, styles.grid3x2]}>
+    <View style={[...cardBase, styles.grid3x2]}>
       {values.map((v, i) => (
         <DiceSlot key={i} value={v} index={i} {...common} />
       ))}
@@ -137,7 +145,7 @@ const styles = StyleSheet.create({
     borderColor: colors.cardBorder,
     paddingVertical: 20,
     paddingHorizontal: 16,
-    minHeight: 180,
+    minHeight: 160,
     width: '100%',
     maxWidth: 400,
     alignSelf: 'center',
@@ -146,6 +154,11 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.12,
     shadowRadius: 12,
     elevation: 4,
+  },
+  cardCompact: {
+    minHeight: 0,
+    paddingVertical: 12,
+    borderRadius: 22,
   },
   center: {
     justifyContent: 'center',
